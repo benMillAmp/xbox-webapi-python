@@ -88,9 +88,25 @@ class Session:
             if rate_limits.is_exceeded():
                 raise RateLimitExceededException("Rate limit exceeded", rate_limits)
 
-        response = await self._auth_mgr.session.request(
-            method, url, **kwargs, headers=headers, params=params, data=data
-        )
+        # response = await self._auth_mgr.session.request(
+        #     method, url, **kwargs, headers=headers, params=params, data=data
+        # )
+
+        session = kwargs.pop("session", None)
+
+        if session is None:
+            if self._auth_mgr.session is None:
+                raise Exception(
+                    "Failed! If AuthenticationManager is created with proxy_sesssions session for requsts "
+                    'should be passed explicitly, through "session" argument'
+                )
+            response = await self._auth_mgr.session.request(
+                method, url, **kwargs, headers=headers, params=params, data=data
+            )
+        else:
+            response = await session.request(
+                method, url, **kwargs, headers=headers, params=params, data=data
+            )
 
         if rate_limits:
             rate_limits.increment()

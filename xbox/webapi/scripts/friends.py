@@ -45,7 +45,7 @@ async def async_main():
 
     async with SignedSession() as session:
         auth_mgr = AuthenticationManager(
-            session, args.client_id, args.client_secret, ""
+            args.client_id, args.client_secret, "", client_session=session
         )
 
         with open(args.tokens) as f:

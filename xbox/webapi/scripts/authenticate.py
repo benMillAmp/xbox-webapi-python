@@ -75,7 +75,7 @@ async def do_auth(
 ):
     async with SignedSession() as session:
         auth_mgr = AuthenticationManager(
-            session, client_id, client_secret, redirect_uri
+            client_id, client_secret, redirect_uri, client_session=session
         )
 
         # Refresh tokens if we have them

@@ -26,7 +26,9 @@ from tests.common import get_response
 @pytest_asyncio.fixture(scope="function")
 async def auth_mgr():
     session = SignedSession()
-    mgr = AuthenticationManager(session, "abc", "123", "http://localhost")
+    mgr = AuthenticationManager(
+        "abc", "123", "http://localhost", client_session=session
+    )
     mgr.oauth = OAuth2TokenResponse.model_validate_json(
         get_response("auth_oauth2_token")
     )
