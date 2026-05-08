@@ -69,20 +69,36 @@ class AchievementsProvider(RateLimitedProvider):
         return Achievement360Response(**resp.json())
 
     async def get_achievements_xbox360_earned(
-        self, xuid, title_id, **kwargs
+        self,
+        xuid,
+        title_id: str = None,
+        continuation_token: str = None,
+        max_items: int = 10000,
+        **kwargs,
     ) -> Achievement360Response:
         """
-        Get earned achievements for specific X360 title id
+        Get earned achievements for specific X360 title id if one is passed, else get all earned achievements
+        for all titles of player
 
         Args:
             xuid (str): Xbox User Id
             title_id (str): Xbox 360 Title Id
+            continuation_token (str): continuation token access to the next page in results
+            max_items (int): number of items per page
 
         Returns:
             :class:`Achievement360Response`: Achievement 360 Response
         """
-        url = f"{self.ACHIEVEMENTS_URL}/users/xuid({xuid})/achievements?"
-        params = {"titleId": title_id}
+        url = f"{self.ACHIEVEMENTS_URL}/users/xuid({xuid})/achievements"
+        params = {
+            "maxItems": max_items,
+            "orderBy": "UnlockTime",
+            "unlockedOnly": "true",
+        }
+        if title_id:
+            params["titleId"] = title_id
+        if continuation_token:
+            params["continuationToken"] = title_id
         resp = await self.client.session.get(
             url,
             params=params,
@@ -116,20 +132,36 @@ class AchievementsProvider(RateLimitedProvider):
         return Achievement360ProgressResponse(**resp.json())
 
     async def get_achievements_xboxone_gameprogress(
-        self, xuid, title_id, **kwargs
+        self,
+        xuid,
+        title_id: str = None,
+        continuation_token: str = None,
+        max_items: int = 10000,
+        **kwargs,
     ) -> AchievementResponse:
         """
-        Get gameprogress for Xbox One title
+        Get gameprogress for Xbox One title if one is passed, else get all earned achievements
+         for all titles of player
 
-        Args:
-            xuid (str): Xbox User Id
-            title_id (str): Xbox One Title Id
+         Args:
+             xuid (str): Xbox User Id
+             title_id (str): Xbox One Title Id
+             continuation_token (str): continuation token access to the next page in results
+             max_items (int): number of items per page
 
-        Returns:
-            :class:`AchievementResponse`: Achievement Response
+         Returns:
+             :class:`AchievementResponse`: Achievement Response
         """
         url = f"{self.ACHIEVEMENTS_URL}/users/xuid({xuid})/achievements?"
-        params = {"titleId": title_id}
+        params = {
+            "maxItems": max_items,
+            "orderBy": "UnlockTime",
+            "unlockedOnly": "true",
+        }
+        if title_id:
+            params["titleId"] = title_id
+        if continuation_token:
+            params["continuationToken"] = title_id
         resp = await self.client.session.get(
             url,
             params=params,

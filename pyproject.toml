@@ -54,7 +54,6 @@ dev = [
     "black==23.11.0",
 #   "flake8-docstrings==1.5.0",
     "pydocstyle==6.1.1",
-    "bandit==1.7.5",
     "isort==5.12.0",
 ]
 docs = [
@@ -122,24 +121,6 @@ indent-style = "space"
 skip-magic-trailing-comma = false
 # Like Black, automatically detect the appropriate line ending.
 line-ending = "auto"
-
-[tool.bandit]
-exclude_dirs = ["tests"]
-tests = [
-  "B108",
-  "B306",
-  "B307",
-  "B313",
-  "B314",
-  "B315",
-  "B316",
-  "B317",
-  "B318",
-  "B319",
-  "B320",
-  "B602",
-  "B604"
-]
 
 [tool.black]
 target-version = ["py37", "py38", "py39", "py310", "py311"]

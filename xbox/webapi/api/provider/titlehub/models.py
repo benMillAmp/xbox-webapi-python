@@ -64,10 +64,10 @@ class Detail(CamelCaseModel):
     attributes: List[Attribute]
     availabilities: List[Availability]
     capabilities: List[str]
-    description: str
-    developer_name: str
+    description: Optional[str] = None
+    developer_name: Optional[str] = None
     genres: Optional[List[str]] = None
-    publisher_name: str
+    publisher_name: Optional[str] = None
     min_age: Optional[int] = None
     release_date: Optional[datetime] = None
     short_description: Optional[str] = None
@@ -84,8 +84,8 @@ class Title(CamelCaseModel):
     name: str
     type: str
     devices: List[str]
-    display_image: str
-    media_item_type: str
+    display_image: Optional[str] = None
+    media_item_type: Optional[str] = None
     modern_title_id: Optional[str] = None
     is_bundle: bool
     achievement: Optional[Achievement] = None

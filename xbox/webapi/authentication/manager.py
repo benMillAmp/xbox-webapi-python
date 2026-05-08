@@ -24,13 +24,16 @@ DEFAULT_SCOPES = ["Xboxlive.signin", "Xboxlive.offline_access"]
 class AuthenticationManager:
     def __init__(
         self,
-        client_session: SignedSession,
         client_id: str,
         client_secret: str,
         redirect_uri: str,
         scopes: Optional[List[str]] = None,
+        client_session: SignedSession = None,
+        proxy_sessions=None,
     ):
-        if not isinstance(client_session, (SignedSession, httpx.AsyncClient)):
+        if client_session is not None and not isinstance(
+            client_session, (SignedSession, httpx.AsyncClient)
+        ):
             raise DeprecationWarning(
                 """Xbox WebAPI changed to use SignedSession (wrapped httpx.AsyncClient).
                 Please check the documentation"""
@@ -41,6 +44,7 @@ class AuthenticationManager:
         self._client_secret: str = client_secret
         self._redirect_uri: str = redirect_uri
         self._scopes: List[str] = scopes or DEFAULT_SCOPES
+        self.proxy_sessions = proxy_sessions
 
         self.oauth: OAuth2TokenResponse = None
         self.user_token: XAUResponse = None
@@ -106,9 +110,28 @@ class AuthenticationManager:
         data["client_id"] = self._client_id
         if self._client_secret:
             data["client_secret"] = self._client_secret
-        resp = await self.session.post(
-            "https://login.live.com/oauth20_token.srf", data=data
-        )
+
+        if self.proxy_sessions:
+            while True:
+                session = self.proxy_sessions.get_random_proxy()
+                try:
+                    resp = await session.post(
+                        "https://login.live.com/oauth20_token.srf", data=data
+                    )
+                    break
+                except Exception as e:
+                    if e.__class__.__name__ == "RequestFailedException":
+                        try:
+                            await session.close()
+                            self.proxy_sessions.remove(session)
+                        except Exception:
+                            pass
+                    else:
+                        raise e
+        else:
+            resp = await self.session.post(
+                "https://login.live.com/oauth20_token.srf", data=data
+            )
         resp.raise_for_status()
         return OAuth2TokenResponse(**resp.json())
 
@@ -132,7 +155,23 @@ class AuthenticationManager:
             },
         }
 
-        resp = await self.session.post(url, json=data, headers=headers)
+        if self.proxy_sessions:
+            while True:
+                session = self.proxy_sessions.get_random_proxy()
+                try:
+                    resp = await session.post(url, json=data, headers=headers)
+                    break
+                except Exception as e:
+                    if e.__class__.__name__ == "RequestFailedException":
+                        try:
+                            await session.close()
+                            self.proxy_sessions.remove(session)
+                        except Exception:
+                            pass
+                    else:
+                        raise e
+        else:
+            resp = await self.session.post(url, json=data, headers=headers)
         resp.raise_for_status()
         return XAUResponse(**resp.json())
 
@@ -151,7 +190,23 @@ class AuthenticationManager:
             },
         }
 
-        resp = await self.session.post(url, json=data, headers=headers)
+        if self.proxy_sessions:
+            while True:
+                session = self.proxy_sessions.get_random_proxy()
+                try:
+                    resp = await session.post(url, json=data, headers=headers)
+                    break
+                except Exception as e:
+                    if e.__class__.__name__ == "RequestFailedException":
+                        try:
+                            await session.close()
+                            self.proxy_sessions.remove(session)
+                        except Exception:
+                            pass
+                    else:
+                        raise e
+        else:
+            resp = await self.session.post(url, json=data, headers=headers)
         if resp.status_code == 401:  # if unauthorized
             print(
                 "Failed to authorize you! Your password or username may be wrong or you are trying to use child account (< 18 years old)"

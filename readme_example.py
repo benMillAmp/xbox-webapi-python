@@ -29,7 +29,9 @@ async def async_main():
         """
         Initialize with global OAUTH parameters from above
         """
-        auth_mgr = AuthenticationManager(session, client_id, client_secret, "")
+        auth_mgr = AuthenticationManager(
+            client_id, client_secret, "", client_session=session
+        )
 
         """
         Read in tokens that you received from the `xbox-authenticate`-script previously

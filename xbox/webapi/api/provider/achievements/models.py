@@ -1,4 +1,4 @@
-from datetime import datetime, time
+from datetime import datetime
 from typing import Any, List, Optional
 
 from pydantic import BaseModel
@@ -106,7 +106,7 @@ class Achievement(CamelCaseModel):
     participation_type: str
     time_window: Any = None
     rewards: List[Reward]
-    estimated_time: time
+    estimated_time: str
     deeplink: Any = None
     is_revoked: bool
 
