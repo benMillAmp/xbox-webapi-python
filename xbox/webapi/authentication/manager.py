@@ -133,6 +133,7 @@ class AuthenticationManager:
                 "https://login.live.com/oauth20_token.srf", data=data
             )
         resp.raise_for_status()
+        print(f"RESPONSE: {resp}")
         return OAuth2TokenResponse(**resp.json())
 
     async def request_user_token(
