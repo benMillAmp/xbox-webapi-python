@@ -118,7 +118,9 @@ class AuthenticationManager:
                     resp = await session.post(
                         "https://login.live.com/oauth20_token.srf", data=data
                     )
-                    break
+                    resp.raise_for_status()
+                    resp_json = await resp.json()
+                    return OAuth2TokenResponse(**resp_json)
                 except Exception as e:
                     if e.__class__.__name__ == "RequestFailedException":
                         try:
@@ -132,9 +134,8 @@ class AuthenticationManager:
             resp = await self.session.post(
                 "https://login.live.com/oauth20_token.srf", data=data
             )
-        resp.raise_for_status()
-        print(f"RESPONSE: {resp}")
-        return OAuth2TokenResponse(**resp.json())
+            resp.raise_for_status()
+            return OAuth2TokenResponse(**resp.json())
 
     async def request_user_token(
         self,
@@ -161,7 +162,9 @@ class AuthenticationManager:
                 session = self.proxy_sessions.get_random_proxy()
                 try:
                     resp = await session.post(url, json=data, headers=headers)
-                    break
+                    resp.raise_for_status()
+                    resp_json = await resp.json()
+                    return XAUResponse(**resp_json)
                 except Exception as e:
                     if e.__class__.__name__ == "RequestFailedException":
                         try:
@@ -173,8 +176,8 @@ class AuthenticationManager:
                         raise e
         else:
             resp = await self.session.post(url, json=data, headers=headers)
-        resp.raise_for_status()
-        return XAUResponse(**resp.json())
+            resp.raise_for_status()
+            return XAUResponse(**resp.json())
 
     async def request_xsts_token(
         self, relying_party: str = "http://xboxlive.com"
@@ -196,7 +199,9 @@ class AuthenticationManager:
                 session = self.proxy_sessions.get_random_proxy()
                 try:
                     resp = await session.post(url, json=data, headers=headers)
-                    break
+                    resp.raise_for_status()
+                    resp_json = await resp.json()
+                    return XSTSResponse(**resp_json)
                 except Exception as e:
                     if e.__class__.__name__ == "RequestFailedException":
                         try:
