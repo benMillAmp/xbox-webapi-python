@@ -5,8 +5,8 @@ Get Userprofiles by XUID or Gamertag
 """
 from typing import List
 
-from xbox.webapi.api.provider.ratelimitedprovider import RateLimitedProvider
 from xbox.webapi.api.provider.profile.models import ProfileResponse, ProfileSettings
+from xbox.webapi.api.provider.ratelimitedprovider import RateLimitedProvider
 
 
 class ProfileProvider(RateLimitedProvider):
@@ -54,7 +54,12 @@ class ProfileProvider(RateLimitedProvider):
             **kwargs,
         )
         resp.raise_for_status()
-        return ProfileResponse(**resp.json())
+        session = kwargs.pop("session", None)
+        if session is None:
+            return ProfileResponse(**resp.json())
+        else:
+            resp_json = await resp.json()
+            return ProfileResponse(**resp_json)
 
     async def get_profile_by_xuid(self, target_xuid: str, **kwargs) -> ProfileResponse:
         """

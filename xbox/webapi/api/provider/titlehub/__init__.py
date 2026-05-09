@@ -59,7 +59,12 @@ class TitlehubProvider(BaseProvider):
             url, params=params, headers=self._headers, **kwargs
         )
         resp.raise_for_status()
-        return TitleHubResponse(**resp.json())
+        session = kwargs.pop("session", None)
+        if session is None:
+            return TitleHubResponse(**resp.json())
+        else:
+            resp_json = await resp.json()
+            return TitleHubResponse(**resp_json)
 
     async def _get_title_info(
         self, moniker: str, fields: Optional[List[TitleFields]] = None, **kwargs
