@@ -3,12 +3,12 @@ People - Access friendlist from own profiles and others
 """
 from typing import List
 
-from xbox.webapi.api.provider.ratelimitedprovider import RateLimitedProvider
 from xbox.webapi.api.provider.people.models import (
     PeopleDecoration,
     PeopleResponse,
     PeopleSummaryResponse,
 )
+from xbox.webapi.api.provider.ratelimitedprovider import RateLimitedProvider
 
 
 class PeopleProvider(RateLimitedProvider):
@@ -79,7 +79,13 @@ class PeopleProvider(RateLimitedProvider):
         url = f"{self.PEOPLE_URL}/users/xuid({xuid})/people/social/decoration/{decoration}"
         resp = await self.client.session.get(url, headers=self._headers, **kwargs)
         resp.raise_for_status()
-        return PeopleResponse(**resp.json())
+        session = kwargs.pop("session", None)
+        if session is None:
+            parsed = PeopleResponse(**resp.json())
+        else:
+            resp_json = await resp.json()
+            parsed = PeopleResponse.model_validate(**resp_json)
+        return parsed
 
     async def get_friends_own_batch(
         self,
