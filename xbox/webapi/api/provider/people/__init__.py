@@ -84,7 +84,7 @@ class PeopleProvider(RateLimitedProvider):
             parsed = PeopleResponse(**resp.json())
         else:
             resp_json = await resp.json()
-            parsed = PeopleResponse.model_validate(**resp_json)
+            parsed = PeopleResponse(**resp_json)
         return parsed
 
     async def get_friends_own_batch(
